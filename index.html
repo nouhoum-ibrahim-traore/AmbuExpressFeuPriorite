@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Feu Tricolore - ESP32</title>
+
+<link rel="stylesheet" href="styles.css">
+<script type="module" src="app.js"></script>
+
+</head>
+
+<body>
+
+<div class="card">
+
+  <h1>🚦 Feu Tricolore</h1>
+  <div id="statusBadge" class="status-badge offline">Offline</div>
+
+  <!-- Login UI -->
+  <div id="authBox">
+    <input id="emailField" type="email" placeholder="Email" />
+    <input id="passwordField" type="password" placeholder="Mot de passe" />
+    <button id="loginBtn" class="btn login-btn">Connexion</button>
+    <p id="authMsg"></p>
+  </div>
+
+  <!-- Control UI -->
+  <div id="controlBox" style="display:none;">
+    
+    <!-- Bouton Priorité -->
+    <div class="priority-section">
+      <button id="priorityBtn" class="priority-button">
+        🚨 Mode Priorité
+      </button>
+      <div id="priorityStatus" class="priority-status">Mode Normal</div>
+      <div id="countdown" class="countdown"></div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Contrôle Manuel (pour test/debug) -->
+    <h3>Etat du feu en temps réel</h3>
+    <div class="traffic-light">
+      <button id="gpio1Btn" class="gpio-button green" data-gpio="gpio1">🟢 Vert (GPIO 12)</button>
+      <div id="gpio1Status" class="gpio-status">Éteint</div>
+
+      <button id="gpio2Btn" class="gpio-button orange" data-gpio="gpio2">🟠 Orange (GPIO 13)</button>
+      <div id="gpio2Status" class="gpio-status">Éteint</div>
+
+      <button id="gpio3Btn" class="gpio-button red" data-gpio="gpio3">🔴 Rouge (GPIO 14)</button>
+      <div id="gpio3Status" class="gpio-status">Éteint</div>
+    </div>
+
+    <button id="logoutBtn" class="btn logout-btn">Déconnexion</button>
+  </div>
+
+</div>
+<!-- Boîte de dialogue fin de priorité -->
+<div id="endPriorityModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <h2>⏰ Fin de la priorité</h2>
+    <p>Le temps de priorité (60 secondes) est écoulé.</p>
+    <p>Que souhaitez-vous faire ?</p>
+    
+    <div class="modal-buttons">
+      <button id="btnNormal" class="btn-modal btn-normal">
+        🚦 Passer au mode normal
+      </button>
+      <button id="btnProlonger" class="btn-modal btn-prolonger">
+        🚨 Prolonger la priorité (60s)
+      </button>
+    </div>
+    
+    <div id="autoCountdown" class="auto-countdown">
+      Retour automatique au mode normal dans <span id="autoSeconds">10</span>s...
+    </div>
+  </div>
+</div>
+</body>
+</html>
