@@ -232,7 +232,7 @@ async function startPriorityGreenPhase() {
     timeLeft--;
     updateCountdown(timeLeft);
     
-    if (timeLeft <= 0) {
+    if (timeLeft <= 10) {
       clearInterval(countdownInterval);
       // Ouvrir le modal au lieu de désactiver directement
       openEndPriorityModal();
