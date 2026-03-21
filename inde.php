@@ -127,3 +127,19 @@ $entries = $pdo->query("SELECT * FROM entries ORDER BY created_at DESC")->fetchA
 </body>
 </html>
 EOF
+----------------------------------------------
+sudo tee /etc/apache2/sites-available/momentum.conf > /dev/null << 'EOF'
+<VirtualHost *:80>
+    ServerName localhost
+    DocumentRoot /var/www/momentum
+    
+    <Directory /var/www/momentum>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+    
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+EOF
