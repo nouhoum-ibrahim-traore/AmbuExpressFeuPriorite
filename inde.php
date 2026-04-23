@@ -1,3 +1,68 @@
+# Sur VM1
+sudo apt update
+sudo apt install nginx
+
+# Configuration du load balancer
+sudo tee /etc/nginx/nginx.conf > /dev/null << 'EOF'
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+
+events {
+    worker_connections 768;
+}
+
+http {
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    # Configuration du upstream avec health checks passifs
+    upstream backend {
+        least_conn;  # Algorithme: moins de connexions actives
+        
+        server 192.168.1.11:80 max_fails=3 fail_timeout=30s;
+        server 192.168.1.12:80 max_fails=3 fail_timeout=30s;
+        
+        # Si les deux sont down, erreur 502
+    }
+
+    server {
+        listen 80;
+        server_name _;
+
+        location / {
+            proxy_pass http://backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            
+            # Configuration failover
+            proxy_next_upstream error timeout http_500 http_502 http_503 http_504;
+            proxy_next_upstream_tries 2;
+            proxy_connect_timeout 5s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+        }
+
+        # Page de statut pour monitoring
+        location /nginx_status {
+            stub_status on;
+            allow 127.0.0.1;
+            allow 192.168.1.0/24;
+            deny all;
+        }
+    }
+}
+EOF
+
+sudo systemctl restart nginx
+--------------------------------------------------
 # Sur VM2 et VM3 (identique)
 sudo apt update
 sudo apt install nginx php-fpm php-mysql nfs-common
