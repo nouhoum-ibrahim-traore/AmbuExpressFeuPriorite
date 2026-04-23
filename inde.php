@@ -1,3 +1,35 @@
+# Installer MariaDB et créer la base
+sudo apt update
+sudo apt install mariadb-server nfs-kernel-server
+
+# Configuration MySQL
+sudo mysql -e "CREATE DATABASE momentum_db;"
+sudo mysql -e "CREATE USER 'momentum'@'%' IDENTIFIED BY 'password123';"
+sudo mysql -e "GRANT ALL PRIVILEGES ON momentum_db.* TO 'momentum'@'%';"
+sudo mysql -e "FLUSH PRIVILEGES;"
+
+# Créer la table pour stocker les entrées
+sudo mysql momentum_db -e "
+CREATE TABLE entries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    image_path VARCHAR(255) NOT NULL,
+    text_content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);"
+
+# Configurer NFS pour partager le dossier images
+sudo mkdir -p /var/www/images
+sudo chown nobody:nogroup /var/www/images
+
+# Éditer /etc/exports
+echo "/var/www/images 192.168.1.11(rw,sync,no_subtree_check) 192.168.1.12(rw,sync,no_subtree_check)" | sudo tee -a /etc/exports
+sudo exportfs -a
+sudo systemctl restart nfs-kernel-server
+
+# Autoriser les connexions distantes à MySQL
+sudo sed -i 's/bind-address.*/bind-address = 0.0.0.0/' /etc/mysql/mariadb.conf.d/50-server.cnf
+sudo systemctl restart mariadb
+----------------------------------
 sudo tee /var/www/momentum/index.php > /dev/null << 'EOF'
 <?php
 // Configuration base de données VM4
