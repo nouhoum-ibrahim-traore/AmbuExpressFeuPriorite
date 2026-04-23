@@ -1,3 +1,16 @@
+# Sur VM2 et VM3 (identique)
+sudo apt update
+sudo apt install nginx php-fpm php-mysql nfs-common
+
+# Monter le partage NFS des images
+sudo mkdir -p /var/www/images
+sudo mount 192.168.1.13:/var/www/images /var/www/images
+echo "192.168.1.13:/var/www/images /var/www/images nfs defaults 0 0" | sudo tee -a /etc/fstab
+
+# Créer le site web Momentum
+sudo mkdir -p /var/www/momentum
+sudo chown -R www-data:www-data /var/www/momentum
+-----------------------------------------
 # Installer MariaDB et créer la base
 sudo apt update
 sudo apt install mariadb-server nfs-kernel-server
